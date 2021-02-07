@@ -8,59 +8,59 @@
 </div>
 <script>
     // Initialize and add the map
+
     function initMap() {
-
-        var locations = [
-            ['Bondi Beach', -33.890542, 151.274856, 4],
-            ['Coogee Beach', -33.923036, 151.259052, 5],
-            ['Cronulla Beach', -34.028249, 151.157507, 3],
-            ['Manly Beach', -33.80010128657071, 151.28747820854187, 2],
-            ['Maroubra Beach', -33.950198, 151.259302, 1]
-        ];
-
-
-        //The location of Uluru
-        const uluru = { lat: -33.890542, lng: 151.274856 };
-        // The map, centered at Uluru
+        // Create the map.
+        const marker = { lat: 30.173327758439324, lng: 31.594773620178895 };
         const map = new google.maps.Map(document.getElementById("map"), {
-            zoom: 11,
-            center: uluru,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
+            center: marker,
+            zoom: 12,
         });
-        // The marker, positioned at Uluru
+
+
         const marker3 = new google.maps.Marker({
-            position: uluru,
+            position: marker,
             map: map,
+            //icon: 'https://www.pinclipart.com/picdir/big/149-1494416_hand-point-down-comments-hand-point-icon-transparent.png',
+            label: { fontWeight: 'bold', fontSize: '14px', text: 'KFC' }
         });
-        var infowindow = new google.maps.InfoWindow();
 
-        var marker, i;
 
-        for (i = 0; i < locations.length; i++) {
-            marker = new google.maps.Marker({
-                position: { lat: locations[i][1], lng: locations[i][2] },
-                map: map
-            });
+        // Create the places service.
+        const service = new google.maps.places.PlacesService(map);
+        let getNextPage;
+        const moreButton = document.getElementById("more");
 
-            google.maps.event.addListener(marker, 'click', (function (marker, i) {
-                return function () {
-                    infowindow.setContent(locations[i][0]);
-                    infowindow.open(map, marker);
+        moreButton.onclick = function () {
+            moreButton.disabled = true;
+
+            if (getNextPage) {
+                getNextPage();
+            }
+        };
+        // Perform a nearby search.
+        service.nearbySearch(
+            { location: marker, radius: 500, type: "restaurant" },
+            (results, status, pagination) => {
+                if (status !== "OK") return;
+                createMarkers(results, map);
+                moreButton.disabled = !pagination.hasNextPage;
+
+                if (pagination.hasNextPage) {
+                    getNextPage = pagination.nextPage;
                 }
-            })(marker, i));
-        }
+            }
+        );
     }
-
-    // var map = new google.maps.Map(document.getElementById('map'), {
-    //     zoom: 10,
-    //     center: new google.maps.LatLng(-33.92, 151.25),
-    //     mapTypeId: google.maps.MapTypeId.ROADMAP
-    // });
 </script>
+
+
+
 
 <script async
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBOp0pH8QYUOc1E0CbHU8a9_N2Dk0JmJBU&callback=initMap">
     </script>
+
 <script src="static/js/show_result.js"></script>
 
 </body>
